@@ -1,0 +1,6 @@
+{
+  "appId": "com.redfarehub.app",
+  "appName": "RedFareHub",
+  "webDir": "www",
+  "bundledWebRuntime": false
+}
