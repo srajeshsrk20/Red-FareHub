@@ -686,6 +686,7 @@
 
     .ftable{min-width:1180px;}
     .ftable th,.ftable td{padding:7px 8px;font-size:11.5px;}
+    .ftable-swipe-hint{display:block !important;}
     .cab-name{font-size:12px;}
     .num{font-size:12px;}
 
@@ -1056,7 +1057,7 @@
   .chat-toast-close:hover{color:var(--ink);}
   .chat-toast-bar{position:absolute;left:0;bottom:0;height:3px;background:var(--red);width:100%;transform-origin:left;animation:chatToastBar 4.2s linear forwards;}
   @keyframes chatToastBar{from{transform:scaleX(1);}to{transform:scaleX(0);}}
-  @media(max-width:520px){ .chat-dock{right:8px;left:8px;width:auto;bottom:72px;} .chat-launcher{right:14px;bottom:14px;} .chat-toasts{right:8px;left:8px;} .chat-toast{max-width:none;} }
+  @media(max-width:520px){ .chat-dock{right:8px;left:8px;width:auto;bottom:72px;} .chat-launcher{right:8px;bottom:8px;width:40px;height:40px;font-size:17px;opacity:.5;} .chat-toasts{right:8px;left:8px;} .chat-toast{max-width:none;} }
   .chat-menu{position:absolute;top:46px;right:10px;background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,.18);z-index:6;min-width:180px;overflow:hidden;animation:chatBubbleIn .18s ease;}
   .chat-menu-item{padding:9px 13px;font-size:12.5px;cursor:pointer;border-bottom:1px solid #f0eee9;transition:background .12s;}
   .chat-menu-item:hover{background:#faf9f7;}
@@ -1793,7 +1794,7 @@
   .task-popup-dismiss{background:rgba(0,0,0,.18);color:#fff;}
   .task-confetti{position:absolute;top:-10px;border-radius:2px;opacity:.95;animation:taskConfettiFall linear forwards;pointer-events:none;}
   @keyframes taskConfettiFall{to{transform:translateY(420px) rotate(360deg);opacity:0;}}
-  @media(max-width:520px){ .task-dock{left:8px;right:8px;width:auto;bottom:72px;} .task-launcher{left:14px;bottom:14px;} }
+  @media(max-width:520px){ .task-dock{left:8px;right:8px;width:auto;bottom:72px;} .task-launcher{left:8px;bottom:8px;width:40px;height:40px;font-size:17px;opacity:.5;} }
 
   /* ===== Colorful NotePad (multi-note scratchpad, sits above Tasks & Reminders) ===== */
   .notepad-launcher{position:fixed;left:22px;bottom:84px;width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#4361ee 0%,#7209b7 55%,#f72585 100%);color:#fff;border:none;font-size:21px;cursor:grab;box-shadow:0 6px 20px rgba(67,97,238,.4);z-index:403;display:none;align-items:center;justify-content:center;transition:transform .18s cubic-bezier(.34,1.56,.64,1);touch-action:none;}
@@ -1830,7 +1831,7 @@
   .notepad-textarea{flex:1;padding:9px 10px;font-size:14px;line-height:1.5;outline:none;overflow-y:auto;}
   .notepad-title-input:empty::before,.notepad-textarea:empty::before{content:attr(data-placeholder);color:var(--text-faint);}
   .notepad-editor-footer{display:flex;justify-content:space-between;padding:6px 10px;border-top:1px solid var(--line);font-size:9.5px;color:var(--text-dim);background:var(--paper);}
-  @media(max-width:520px){ .notepad-dock{left:8px;right:8px;width:auto;bottom:136px;} .notepad-launcher{left:14px;bottom:72px;} }
+  @media(max-width:520px){ .notepad-dock{left:8px;right:8px;width:auto;bottom:136px;} .notepad-launcher{left:8px;bottom:54px;width:40px;height:40px;font-size:18px;opacity:.5;} }
   /* Checklist items typed into a note */
   .np-check-item{display:flex;align-items:flex-start;gap:6px;margin:2px 0;}
   .np-check-box{cursor:pointer;flex-shrink:0;user-select:none;font-size:14px;line-height:1.5;}
@@ -2022,7 +2023,13 @@
   .ae-chip-tag{font-size:10px;font-weight:700;padding:4px 9px;border-radius:12px;font-family:var(--mono);}
   .ae-chip-tag.ok{background:rgba(47,158,91,.15);color:var(--green);}
   .ae-chip-tag.bad{background:rgba(201,32,53,.13);color:var(--red-dark);}
-  @media(max-width:520px){ .ae-dock{right:8px;left:8px;width:auto;bottom:136px;} .ae-launcher{right:14px;bottom:72px;} }
+  @media(max-width:520px){ .ae-dock{right:8px;left:8px;width:auto;bottom:136px;} .ae-launcher{right:8px;bottom:54px;width:40px;height:40px;font-size:17px;opacity:.5;} }
+  @media(max-width:520px){
+    .chat-launcher,.task-launcher,.notepad-launcher,.ae-launcher{transition:transform .18s cubic-bezier(.34,1.56,.64,1),opacity .2s ease;}
+    .chat-launcher:active,.task-launcher:active,.notepad-launcher:active,.ae-launcher:active,
+    .chat-launcher:focus,.task-launcher:focus,.notepad-launcher:focus,.ae-launcher:focus,
+    .chat-launcher.bubble-dragging,.task-launcher.bubble-dragging,.notepad-launcher.bubble-dragging,.ae-launcher.bubble-dragging{opacity:1;}
+  }
 
   /* ===== Cab Availability dashboard ===== */
   .avail-head-row{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:8px;}
@@ -2381,6 +2388,7 @@
         <tbody id="fareTableBody"></tbody>
       </table>
       </div>
+      <p class="local-hint ftable-swipe-hint" style="display:none;padding:0 12px 8px;">↔ Swipe the table sideways to see Duration, KM, Min. Fare, Split-Up &amp; One-way columns</p>
     </div>
 
     <div class="pkg-empty-state" id="pkgEmptyState">
