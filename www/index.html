@@ -68,7 +68,7 @@
   .input-row{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px;align-items:end;}
   @media(max-width:800px){.input-row{grid-template-columns:1fr 1fr;}}
   .input-row.trip-row{grid-template-columns:max-content max-content max-content max-content max-content max-content max-content;gap:1.4cm;justify-content:start;}
-  @media(max-width:800px){.input-row.trip-row{grid-template-columns:1fr 1fr;}}
+  @media(max-width:800px){.input-row.trip-row{grid-template-columns:1fr 1fr;gap:10px;}}
   .field label{display:block;font-size:10.5px;font-weight:600;color:var(--text-dim);margin-bottom:4px;}
   .field select, .field input{width:100%;padding:7px 10px;border:1.5px solid var(--line);border-radius:8px;font-size:14.5px;font-family:var(--sans);background:#fff;color:var(--text);transition:border-color .15s, box-shadow .15s;}
   #kmsInput, #durationInput{max-width:158px;}
@@ -282,6 +282,7 @@
   .rental-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;}
   @media(max-width:1200px){.rental-grid{grid-template-columns:repeat(2,1fr);}}
   .rental-card{background:var(--paper-2);border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(20,24,31,.05);transition:transform .18s ease, box-shadow .18s ease;}
+  .rental-table-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;}
   .rental-card:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(20,24,31,.12);border-color:#e3d5c8;}
   .rental-card.rental-card-disabled{opacity:.6;}
   .rental-card.rental-card-disabled:hover{transform:none;box-shadow:0 2px 8px rgba(20,24,31,.05);}
@@ -483,6 +484,8 @@
   .now-badge{display:inline-block;margin-left:8px;background:#16a34a;color:#fff;font-size:9px;font-weight:800;padding:2px 8px;border-radius:20px;vertical-align:middle;letter-spacing:.4px;}
   .local-hint{font-size:10.5px;color:var(--text-faint);margin:8px 2px 0;}
   .local-admin-table{width:100%;border-collapse:collapse;font-size:11.5px;margin-top:10px;}
+  .local-admin-table-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  .local-admin-table-scroll .local-admin-table{min-width:920px;}
   .local-admin-table th,.local-admin-table td{border:1px solid var(--line);padding:4px 5px;text-align:center;}
   .local-admin-table th{background:#faf7f2;font-weight:700;color:var(--text-dim);}
   .local-admin-table td.local-del-cell{width:26px;padding:3px 2px;}
@@ -533,7 +536,7 @@
   .tab-btn{padding:8px 12px;border:none;background:none;font-size:11.5px;font-weight:700;color:var(--text-dim);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;}
   .tab-btn.active{color:var(--amber-dark);border-bottom-color:var(--amber);}
   .tab-content{overflow-y:auto;flex:1;padding-right:4px;}
-  .tab-pane{display:none;}
+  .tab-pane{display:none;overflow-x:auto;-webkit-overflow-scrolling:touch;}
   .tab-pane.active{display:block;}
   .cfg-table{width:100%;border-collapse:collapse;font-size:11.5px;}
 
@@ -678,8 +681,10 @@
 
     .input-row{grid-template-columns:1fr 1fr !important;gap:8px;}
     .input-row .btn-calc{grid-column:1 / -1;width:100%;padding:10px;}
-    .input-row .btn-share-icon{grid-column:1 / -1;}
-    .input-row .durcalc-wrap{grid-column:1 / -1;}
+    .input-row.trip-row > .field:first-child{grid-column:1 / -1;}
+    .trip-icons-row{grid-column:1 / -1;display:flex;align-items:center;justify-content:center;gap:16px;}
+    .trip-icons-row .btn-share-icon,.trip-icons-row .btn-durcalc-icon{width:44px;}
+    .trip-icons-row .hill-check-pill{width:44px;}
 
     .city-toggle-bar{gap:5px;margin-bottom:6px;}
     .city-toggle-btn{padding:4px 10px;font-size:11px;}
@@ -739,7 +744,7 @@
   .quote-fare-input .qcname{font-weight:800;color:var(--text);white-space:nowrap;}
   .qnotes{width:100%;border:1px solid var(--line);border-radius:8px;padding:6px 9px;font-family:var(--sans);font-size:12px;resize:vertical;box-sizing:border-box;margin-top:4px;}
   .quote-preview-col{position:sticky;top:10px;}
-  .quote-doc{background:#fff;border:1px solid var(--line);border-radius:12px;padding:24px 26px;box-shadow:0 4px 18px rgba(20,24,31,.09);color:#1c222c;}
+  .quote-doc{background:#fff;border:1px solid var(--line);border-radius:12px;padding:24px 26px;box-shadow:0 4px 18px rgba(20,24,31,.09);color:#1c222c;overflow-x:auto;-webkit-overflow-scrolling:touch;}
   /* ===== Print-friendly A4 quotation ===== body.print-quote-only is toggled
      on right before window.print() and off right after, so this only ever
      applies during an actual print / print-preview. ===== */
@@ -2338,6 +2343,7 @@
           <input type="number" id="durationInput" placeholder="Please enter Hour" min="0.5" step="0.5">
         </div>
         <button class="btn-calc" id="calcBtn">Calculate Fare</button>
+        <div class="trip-icons-row">
         <div class="field hill-fare-field">
           <label>&nbsp;</label>
           <label class="hill-check-pill" id="hillFareCheckWrap" title="Add applicable Hill Charges to the fare">
@@ -2366,6 +2372,7 @@
         <button class="btn-share-icon" id="shareQuoteBtn" title="Create Customer Quotation">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.6" y1="10.6" x2="15.4" y2="6.4"/><line x1="8.6" y1="13.4" x2="15.4" y2="17.6"/></svg>
         </button>
+        </div>
       </div>
     </div>
 
@@ -10218,14 +10225,14 @@ function renderLocalAdmin(){
   const rows = branch.localCalc[localAdminCab];
   const en = ensureLocalEnabled(branch);
   const curLabel = (LOCAL_CABS.find(c => c.key === localAdminCab) || {}).label || localAdminCab;
-  let html = `<label class="local-switch" style="margin:2px 0 12px;"><input type="checkbox" id="localCabEnabled" ${en[localAdminCab] !== false ? "checked" : ""}> Available in this city \u2014 show ${curLabel} fares in the matrix</label><table class="local-admin-table"><thead><tr><th>From</th><th>To</th>${LOCAL_PARAM_COLS.map(c => `<th>${c[1]}</th>`).join("")}<th></th></tr></thead><tbody>`;
+  let html = `<label class="local-switch" style="margin:2px 0 12px;"><input type="checkbox" id="localCabEnabled" ${en[localAdminCab] !== false ? "checked" : ""}> Available in this city \u2014 show ${curLabel} fares in the matrix</label><div class="local-admin-table-scroll"><table class="local-admin-table"><thead><tr><th>From</th><th>To</th>${LOCAL_PARAM_COLS.map(c => `<th>${c[1]}</th>`).join("")}<th></th></tr></thead><tbody>`;
   rows.forEach((p,i) => {
     html += `<tr data-rowidx="${i}"><td><input class="local-admin-input" style="width:50px;text-align:center" data-f="from" data-i="${i}" value="${p.from}"></td><td><input class="local-admin-input" style="width:50px;text-align:center" data-f="to" data-i="${i}" value="${p.to}"></td>`;
     LOCAL_PARAM_COLS.forEach(c => { html += `<td><input class="local-admin-input" type="number" step="0.01" data-f="${c[0]}" data-i="${i}" value="${p[c[0]]}"></td>`; });
     html += `<td class="local-del-cell"><button type="button" class="rental-row-delete" data-local-delrow="${i}" title="Delete this slot">\u2212</button></td>`;
     html += `</tr>`;
   });
-  html += `</tbody></table><div class="local-admin-foot"><button type="button" class="rental-add-slot" id="localAdminAddRow"><span class="add-plus">+</span> Add Slot</button></div>`;
+  html += `</tbody></table></div><div class="local-admin-foot"><button type="button" class="rental-add-slot" id="localAdminAddRow"><span class="add-plus">+</span> Add Slot</button></div>`;
   document.getElementById("localAdminBody").innerHTML = html;
   const cb = document.getElementById("localCabEnabled");
   if(cb) cb.addEventListener("change", async () => { ensureLocalEnabled(branch)[localAdminCab] = cb.checked; await saveBranchesToStorage(); renderLocalMatrix(); });
@@ -10427,10 +10434,12 @@ function renderRentalPackages() {
     return `<div class="rental-card ${!enabled ? 'rental-card-disabled' : ''}" data-cabkey="${cabKey}">
       <div class="rental-card-head">${cabKey} ${disabledBadge}</div>
       ${enableToggle}
+      <div class="rental-table-scroll">
       <table class="rental-table">
         <thead>${headRow}</thead>
         <tbody>${rows}</tbody>
       </table>
+      </div>
       ${addSlotFoot}
     </div>`;
   }).join("");
