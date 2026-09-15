@@ -71,6 +71,10 @@
   @media(max-width:800px){.input-row.trip-row{grid-template-columns:1fr 1fr;gap:10px;}}
   .field label{display:block;font-size:10.5px;font-weight:600;color:var(--text-dim);margin-bottom:4px;}
   .field select, .field input{width:100%;padding:7px 10px;border:1.5px solid var(--line);border-radius:8px;font-size:14.5px;font-family:var(--sans);background:#fff;color:var(--text);transition:border-color .15s, box-shadow .15s;}
+  .qhp-wrap{display:flex;gap:6px;align-items:center;}
+  .qhp-wrap .qhp-date{flex:1 1 auto;min-width:0;}
+  .qhp-wrap .qhp-hour,.qhp-wrap .qhp-min{flex:0 0 60px;width:60px;text-align:center;padding-left:4px;padding-right:4px;}
+  .qhp-wrap .qhp-sep{color:var(--text-dim);font-weight:700;}
   #kmsInput, #durationInput{max-width:158px;}
   @media(max-width:800px){ #kmsInput, #durationInput{max-width:none;} }
   .field select:focus, .field input:focus{outline:none;border-color:var(--red);box-shadow:0 0 0 3px rgba(201,32,53,.1);}
@@ -11738,6 +11742,74 @@ function snapDatetimeToQuarterHour(el){
   const val = d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate())+"T"+pad(d.getHours())+":"+pad(d.getMinutes());
   if(el.value!==val) el.value=val;
 }
+// Replaces the native minute list (which most browsers still render as
+// 00-59 even with step="900") with a simple Hour + quarter-hour Minute
+// dropdown, while keeping the original hidden input's id/value contract
+// exactly the same so every existing listener/read on it keeps working.
+function initQuarterHourPicker(id){
+  const orig = document.getElementById(id);
+  if(!orig || orig.dataset.qhpWired) return;
+  orig.dataset.qhpWired = "1";
+  orig.style.display = "none";
+  const wrap = document.createElement("div");
+  wrap.className = "qhp-wrap";
+  const dateInput = document.createElement("input");
+  dateInput.type = "date"; dateInput.className = "qhp-date";
+  const hourSel = document.createElement("select");
+  hourSel.className = "qhp-hour";
+  for(let h=0; h<24; h++){ const o=document.createElement("option"); o.value=String(h).padStart(2,"0"); o.textContent=String(h).padStart(2,"0"); hourSel.appendChild(o); }
+  const sep = document.createElement("span"); sep.className="qhp-sep"; sep.textContent=":";
+  const minSel = document.createElement("select");
+  minSel.className = "qhp-min";
+  [0,15,30,45].forEach(m=>{ const o=document.createElement("option"); o.value=String(m).padStart(2,"0"); o.textContent=String(m).padStart(2,"0"); minSel.appendChild(o); });
+  wrap.appendChild(dateInput); wrap.appendChild(hourSel); wrap.appendChild(sep); wrap.appendChild(minSel);
+  orig.insertAdjacentElement("afterend", wrap);
+
+  let syncing = false;
+  function composeAndPush(){
+    if(syncing) return;
+    if(!dateInput.value){ syncing=true; orig.value=""; syncing=false; return; }
+    syncing = true;
+    orig.value = dateInput.value + "T" + hourSel.value + ":" + minSel.value;
+    syncing = false;
+    orig.dispatchEvent(new Event("input", {bubbles:true}));
+    orig.dispatchEvent(new Event("change", {bubbles:true}));
+  }
+  dateInput.addEventListener("change", composeAndPush);
+  hourSel.addEventListener("change", composeAndPush);
+  minSel.addEventListener("change", composeAndPush);
+
+  function syncFromOrig(){
+    if(syncing) return;
+    syncing = true;
+    const v = orig.value;
+    if(v){
+      const [d,t] = v.split("T");
+      dateInput.value = d || "";
+      if(t){
+        let [h,m] = t.split(":").map(Number);
+        m = Math.round((m||0)/15)*15; if(m===60){m=0; h=(h+1)%24;}
+        hourSel.value = String(h).padStart(2,"0");
+        minSel.value = String(m).padStart(2,"0");
+      } else { hourSel.value="00"; minSel.value="00"; }
+    } else {
+      dateInput.value = ""; hourSel.value = "00"; minSel.value = "00";
+    }
+    syncing = false;
+  }
+  syncFromOrig();
+
+  // Keep the visible Hour/Minute dropdowns in sync whenever other app code
+  // sets `.value` on the original input programmatically (e.g. loading a
+  // saved reminder time).
+  const desc = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value");
+  Object.defineProperty(orig, "value", {
+    configurable:true,
+    get(){ return desc.get.call(orig); },
+    set(v){ desc.set.call(orig, v); syncFromOrig(); }
+  });
+}
+["durCalcStart","durCalcEnd","qStart","qReturn"].forEach(initQuarterHourPicker);
 document.getElementById("durCalcCloseBtn")?.addEventListener("click", durCalcClose);
 document.getElementById("durCalcPopup")?.addEventListener("click", (e) => e.stopPropagation());
 ["durCalcStart","durCalcEnd"].forEach(id => { const el=document.getElementById(id); if(el) el.addEventListener("input", durCalcCompute); });
